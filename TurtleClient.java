@@ -26,9 +26,9 @@ public class TurtleClient {
 
 		// read the file contents into a byte array
 		String fileName = args[0];
-		byte[] file = null;
+		byte[] data = null;
 		try {
-			file = Files.readAllBytes(Paths.get(fileName));
+			data = Files.readAllBytes(Paths.get(fileName));
 		} catch (IOException ex) {
 			System.out.println("file not found");
 			System.exit(-1);
@@ -47,7 +47,7 @@ public class TurtleClient {
 
 			// send the necessary HTTP headers (can use the Writer here)
 			writer.write("Host: " + SERVER_HOST + "\n");
-			writer.write("Content-Length: " + file.length + "\n");
+			writer.write("Content-Length: " + data.length + "\n");
 
 			// send a blank line and flush output to server
 			writer.write("\n");
@@ -59,7 +59,7 @@ public class TurtleClient {
 			// Why? Because we need to send exactly the number of bytes
 			// that we advertised in the Content-Length header, without
 			// any character encoding messing things up
-			os.write(file);
+			os.write(data);
 
 			// flush output to server
 			os.flush();
@@ -80,17 +80,15 @@ public class TurtleClient {
 			}
 
 			// read the response message body into a byte array
-			int idx = 0;
-			byte b;
-			byte[] reply = new byte[bytes];
-			while (idx < bytes && (b = (byte) is.read()) != -1) {
-				reply[idx++] = b;
-			}
+			data = new byte[bytes];
+			for (int b, idx = 0; 
+					idx < bytes && (b = is.read()) != -1;
+					data[idx++] = (byte)b);
 
 			// decode the message bytes and output as text
 			// For this exercise you should assume that the
 			// message body is unicode text encoded with UTF-8.
-			String response = new String(reply, "UTF-8");
+			String response = new String(data, "UTF-8");
 			System.out.println(response);
 		}
 	}
